@@ -5,3 +5,13 @@ services:
     ports:
       - "443:443"
     container_name: nginx
+  wordpress:
+    build: srcs/requirements/wordpress
+    ports:
+      - "9000:9000"
+    container_name: wordpress
+
+networks:
+  inception:
+    driver: bridge
+    name: inception_network

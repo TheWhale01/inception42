@@ -7,9 +7,12 @@ all:
 
 down:
 	$(COMPOSE) down
+	docker rmi -f srcs-nginx
+	docker rmi -f srcs-wordpress
 
 status:
 	docker ps -a
+	docker network ls
 
 re: down all
 
