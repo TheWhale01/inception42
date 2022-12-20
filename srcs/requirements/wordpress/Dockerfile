@@ -1,14 +1,24 @@
 FROM alpine:3.16
 
-RUN apk update ; apk upgrade ; apk add php8 php8-fpm
+RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/community" >> /etc/apk/repositories
 
-RUN mkdir -p /var/www/html
-RUN wget http://wordpress.org/latest.tar.gz && tar -xzvf latest.tar.gz
-RUN rm latest.tar.gz && mv wordpress /var/www/html/
-RUN adduser -u 82 -D -S -G www-data www-data && chmod 777 -R /var/www/html/wordpress \
-	&& chown www-data:www-data -R /var/www/html/wordpress
+RUN apk update ; apk upgrade ; apk add php7 php7-common php7-session \
+	php7-iconv php7-json php7-gd php7-curl php7-xml php7-mysqli \
+	php7-imap php7-cgi fcgi php7-pdo php7-pdo_mysql php7-soap \
+	php7-xmlrpc php7-posix php7-mcrypt php7-gettext php7-ldap \
+	php7-ctype php7-dom php7-simplexml php7-fpm php7-phar
 
-COPY conf/default.conf /etc/php8/php-fpm.d/www.conf
+RUN mkdir -p /var/www/html/wordpress
+RUN adduser -u 82 -D -S -G www-data www-data
+
+# WP CLI
+RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar ; chmod +x wp-cli.phar ; mv wp-cli.phar /usr/local/bin/wp
+
+#WP INSTALL
+RUN cd /var/www/html/wordpress ; wp core download --allow-root ; chown -R www-data:www-data /var/www/html/wordpress
+
+COPY conf/default.conf /etc/php7/php-fpm.d/www.conf
+COPY conf/wp-config.php /var/www/html/wordpress
 
 EXPOSE 9000
-ENTRYPOINT [ "tail", "-f" ]
+ENTRYPOINT [ "/usr/sbin/php-fpm7", "-F" ]

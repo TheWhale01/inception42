@@ -1,15 +1,30 @@
 version: '3.9'
 services:
   nginx:
+    depends_on:
+      - wordpress
     build: srcs/requirements/nginx
     ports:
       - "443:443"
     container_name: nginx
   wordpress:
+    env_file:
+      - .env
+    depends_on:
+      - mariadb
     build: srcs/requirements/wordpress
-    ports:
-      - "9000:9000"
     container_name: wordpress
+  mariadb:
+    env_file:
+      - .env
+    build: srcs/requirements/mariadb
+    volumes:
+      - mariadb_vol:/home/hubretec/data
+    container_name: mariadb
+
+volumes:
+  mariadb_vol:
+    external: false
 
 networks:
   inception:

@@ -7,8 +7,7 @@ all:
 
 down:
 	$(COMPOSE) down
-	docker rmi -f srcs-nginx
-	docker rmi -f srcs-wordpress
+	docker system prune
 
 status:
 	docker ps -a
